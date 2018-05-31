@@ -1,9 +1,11 @@
 package fr.picedr.bot;
 
-import javax.security.auth.login.LoginException;
-
 import java.util.Calendar;
+import java.util.Hashtable;
+import java.util.List;
 
+import fr.picedr.bot.dao.BotDAO;
+import fr.picedr.bot.exception.DataNotFoundException;
 import fr.picedr.bot.listener.MiscListener;
 import fr.picedr.bot.listener.PrivateListener;
 import fr.picedr.bot.listener.PublicListener;
@@ -25,6 +27,10 @@ public class Bot {
 	 * call stop() method to pass it to true and stop the bot
 	 */
 	private boolean stop = false;
+
+    private Hashtable<String,List<String>>  roles;
+    private Hashtable<String,Hashtable<String,String>>  serversConf;
+    private Hashtable<String,Hashtable<String,String>>  services;
 
 	private Logger logger = LoggerFactory.getLogger(Bot.class);
 
@@ -49,15 +55,11 @@ public class Bot {
 	
 		try {
 
-			String botId = System.getProperty("botId");
-
-
 			JDA  jda;
-			
 	
 		 	// Connect to Discord
 	 		jda = new JDABuilder(AccountType.BOT)
-			 .setToken(botId)
+			 .setToken(getKey())
 			 .setBulkDeleteSplittingEnabled(false)
 			 .buildBlocking();
 			/*
@@ -66,6 +68,8 @@ public class Bot {
 			 * - PublicListener : for public channels messages
 			 * - MiscListener :  others such as connection of users, playng games, ...
 			 */
+
+			this.setConf();
 			jda.addEventListener(new PrivateListener());
 			jda.addEventListener(new PublicListener());
 			jda.addEventListener(new MiscListener());
@@ -100,7 +104,31 @@ public class Bot {
 	}
 
 	public void stop(){
-		this.stop = true;
+	    this.stop = true;
 	}
+
+	private String getKey() throws DataNotFoundException {
+	    BotDAO botDAO = new BotDAO();
+	    return botDAO.getBotKey();
+    }
+
+    private void setConf(){
+        BotDAO botDAO = new BotDAO();
+        this.roles = botDAO.getRoles();
+        this.serversConf = botDAO.getServersConf();
+        this.services = botDAO.getServersServices();
+    }
+
+    public Hashtable<String, List<String>> getRoles() {
+        return roles;
+    }
+
+    public Hashtable<String, Hashtable<String, String>> getServersConf() {
+        return serversConf;
+    }
+
+    public Hashtable<String, Hashtable<String, String>> getServices() {
+        return services;
+    }
 
 }
