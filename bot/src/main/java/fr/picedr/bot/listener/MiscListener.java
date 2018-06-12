@@ -1,5 +1,8 @@
 package fr.picedr.bot.listener;
 
+import fr.picedr.bot.Bot;
+import fr.picedr.bot.Params;
+import fr.picedr.bot.admin.AdminService;
 import net.dv8tion.jda.core.entities.Channel;
 import net.dv8tion.jda.core.entities.Game;
 import net.dv8tion.jda.core.entities.Guild;
@@ -26,12 +29,15 @@ public class MiscListener  implements EventListener {
         if (event instanceof UserUpdateGameEvent) {
             logger.debug("UserUpdateGameEvent");
             //A user change game status
-            UserUpdateGameEvent  e = (UserUpdateGameEvent ) event;
+            UserUpdateGameEvent  e = (UserUpdateGameEvent) event;
             Guild server = e.getGuild();
             User user = e.getMember().getUser();
             Game newGame =  e.getNewGame();
             Game oldGame = e.getOldGame();
-            logger.debug("server=<"+server.getName()+"> - user=<"+user.getName()+"> - newGame=<"+newGame.getName()+"> - oldGame=<"+oldGame.getName()+">");
+            logger.debug("server=<"+server.getName()+"> " +
+                    "- user=<"+user.getName()+"> " +
+                    "- newGame=<"+newGame.getName()+"> ");// +
+                  //  "- oldGame=<"+oldGame.getName()+">");
 
         }else if (event instanceof GuildVoiceJoinEvent){
             //user join a voice channel
@@ -42,7 +48,12 @@ public class MiscListener  implements EventListener {
             User user = e.getMember().getUser();
             logger.debug("server=<"+server.getName()+"> - channel = <"+channel.getName()+">- user=<"+user.getName()+">");
 
-
+            if (Bot.getInstance().getServices().get(server.getId()).get(Params.SRV_SHAME).equals("1")
+                    && AdminService.getInstance().isShamed(server,user)
+                    && !channel.getId().equals(Bot.getInstance().getServersConf().get(server.getId()).get(Params.CONF_VOICEROLE))){
+                logger.debug("Is shamed");
+                AdminService.getInstance().moveToShame(server,user);
+            }
 
 
 
@@ -60,10 +71,18 @@ public class MiscListener  implements EventListener {
             //user change of voice channel
             logger.debug("GuildVoiceMoveEvent");
             GuildVoiceMoveEvent  e = (GuildVoiceMoveEvent ) event;
+            Guild server = e.getGuild();
             Channel channelL = e.getChannelLeft();
             Channel channelJ= e.getChannelJoined();
             User user = e.getMember().getUser();
             logger.debug("channelL=<"+channelL.getName()+"> - channelJ = <"+channelJ.getName()+">- user=<"+user.getName()+">");
+
+            if (Bot.getInstance().getServices().get(server.getId()).get(Params.SRV_SHAME).equals("1")
+                    && AdminService.getInstance().isShamed(server,user)
+                    && !channelJ.getId().equals(Bot.getInstance().getServersConf().get(server.getId()).get(Params.CONF_VOICEROLE))){
+                logger.debug("Is shamed");
+                AdminService.getInstance().moveToShame(server,user);
+            }
 
 
         } else if (event instanceof GuildMessageReactionAddEvent){

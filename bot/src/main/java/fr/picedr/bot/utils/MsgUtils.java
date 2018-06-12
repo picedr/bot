@@ -14,6 +14,8 @@ public class MsgUtils {
 
     public static int MAX_MSG_SIZE=2000;
 
+    public static String FT_CSS="css";
+
 
     /**
      * Send message to a user
