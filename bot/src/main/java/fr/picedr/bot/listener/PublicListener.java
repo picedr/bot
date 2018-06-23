@@ -4,6 +4,7 @@ import fr.picedr.bot.Bot;
 import fr.picedr.bot.HelpService;
 import fr.picedr.bot.Params;
 import fr.picedr.bot.admin.AdminService;
+import fr.picedr.bot.agenda.AgendaService;
 import fr.picedr.bot.utils.MsgUtils;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Message;
@@ -72,8 +73,12 @@ public class PublicListener implements EventListener {
                         case "!help":
                             HelpService.getInstance().dispatch(server, channel, msg, user, cmd, content);
                             break;
+                        case "!agenda" :
+                        case "!rappel":
+                            AgendaService.getInstance().dispatch(server,channel,msg,user,cmd,content);
+                            break;
                         default:
-                            MsgUtils.tell(channel, "Je ne connais pas cette comamnde");
+                            MsgUtils.tell(channel, "Je ne connais pas cette commande");
                             break;
                     }
                 } else {

@@ -143,7 +143,7 @@ public class AdminService implements BotService {
                 if (channel == null) {
                     MsgUtils.tell(user, "Je ne connais pas cette commande.");
                 } else {
-                    MsgUtils.tell(channel, "Je ne connais pas cette commande.");
+                    MsgUtils.tell(channel, "Je ne connais pas cette commande. Tappe **!help admin** pour plus de details");
                 }
         }
         logger.debug("dispatch - end");
@@ -276,6 +276,16 @@ public class AdminService implements BotService {
                 tell.add("Ce service ne peut être activé tant qu'aucun **rôle d'administrateur** n'est défini.");
                 tell.add("Pour cela, il suffit de lancer la commande :");
                 tell.add("- !conf "+Params.CONF_ADMINROLE+" **idDuRole**");
+                MsgUtils.tellBlock(channel,tell);
+                result = false;
+            }
+        }else if (service.equals(Params.SRV_AGENDA)){
+            if (!Bot.getInstance().getServersConf().get(server.getId()).containsKey(Params.CONF_GENERALCHANNEL)){
+                logger.debug("No "+Params.CONF_GENERALCHANNEL);
+                List<String> tell = new ArrayList<>();
+                tell.add("Ce service ne peut être activé tant qu'un **chan général** n'est pas défini.");
+                tell.add("Pour cela, il suffit de lancer la commande :");
+                tell.add("- !conf "+Params.CONF_GENERALCHANNEL+" **idDuChan**");
                 MsgUtils.tellBlock(channel,tell);
                 result = false;
             }

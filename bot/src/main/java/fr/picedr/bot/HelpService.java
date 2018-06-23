@@ -1,6 +1,7 @@
 package fr.picedr.bot;
 
 import fr.picedr.bot.admin.AdminService;
+import fr.picedr.bot.agenda.AgendaService;
 import fr.picedr.bot.utils.MsgUtils;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Message;
@@ -60,6 +61,9 @@ public class HelpService implements BotService {
             switch (content.toLowerCase()) {
                 case "admin":
                     AdminService.help(server, channel);
+                    break;
+                case "agenda":
+                    AgendaService.help(server,channel);
                     break;
                 default:
                     MsgUtils.tell(channel, "Catégorie inconnue");

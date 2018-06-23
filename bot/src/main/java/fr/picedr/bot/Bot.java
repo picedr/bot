@@ -3,7 +3,9 @@ package fr.picedr.bot;
 import java.util.Calendar;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
+import fr.picedr.bot.agenda.AgendaService;
 import fr.picedr.bot.dao.BotDAO;
 import fr.picedr.bot.exception.DataNotFoundException;
 import fr.picedr.bot.listener.MiscListener;
@@ -13,6 +15,8 @@ import fr.picedr.bot.utils.MsgUtils;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
 import net.dv8tion.jda.core.AccountType;
+import net.dv8tion.jda.core.entities.Guild;
+import net.dv8tion.jda.core.entities.TextChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,6 +36,8 @@ public class Bot {
     private Hashtable<String,Hashtable<String,String>>  serversConf;
     private Hashtable<String,Hashtable<String,String>>  services;
 
+	private JDA  jda;
+
 	private Logger logger = LoggerFactory.getLogger(Bot.class);
 
 	private static Bot INSTANCE = null;
@@ -49,13 +55,14 @@ public class Bot {
 	
 	public void start(){
 		logger.info("Start bot");
-		int previousHour = 0;
+		int previousHour = -1;
+		int previousMin=-1;
 		
 		
 	
 		try {
 
-			JDA  jda;
+
 	
 		 	// Connect to Discord
 	 		jda = new JDABuilder(AccountType.BOT)
@@ -78,17 +85,47 @@ public class Bot {
 			MsgUtils.tell(jda.getTextChannelById("439298603371069448"),"Salut !");
 			
 			/*
-			 *Loop every second : 
+			 *Loop every second :
 			 *- to check if stop has been changed to true
 			 *- launch timed job 
 			 */
 			while (!stop){
 				Calendar cal = Calendar.getInstance();
 		        int hour = cal.get(Calendar.HOUR_OF_DAY);
+		        int min = cal.get(Calendar.MINUTE);
+		        boolean newH = false;
+		        boolean newM = false;
 				if (hour!=previousHour){
 					previousHour = hour;
-					
-				}				
+					newH = true;
+				}
+				if (min!=previousMin){
+					previousMin = min;
+					newM = true;
+				}
+
+				if (newH){
+					switch (hour){
+						case 0:
+							for (String key: services.keySet()) {
+								if (services.get(key).get(Params.SRV_AGENDA).equals("1")){
+									Guild server = jda.getGuildById(key);
+									TextChannel chan = jda.getTextChannelById(serversConf.get(key).get(Params.CONF_GENERALCHANNEL));
+									AgendaService.getInstance().today(server,chan);
+								}
+
+							};
+							break;
+						default:
+					}
+				}
+				if (newM){
+					AgendaService.getInstance().now(cal.getTime());
+					if(hour==23 && min==59){
+						AgendaService.getInstance().clear(cal.getTime());
+					}
+				}
+
 				Thread.sleep(1000);				
 			}
 			
@@ -130,5 +167,7 @@ public class Bot {
     public Hashtable<String, Hashtable<String, String>> getServices() {
         return services;
     }
+
+    public JDA getJDA() {return this.jda;}
 
 }

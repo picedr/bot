@@ -35,6 +35,14 @@ public class AdminDAO extends DAO {
 
         }catch (SQLException sqle){
             logger.error("Error muting user");
+        } finally {
+            try {
+                if (ps != null) {
+                    ps.close();
+                }
+            } catch (SQLException sqle){
+                logger.error("Error while closing ps or rs",sqle);
+            }
         }
         logger.debug("mute - end : result=<"+result+">");
         return result;
@@ -61,6 +69,14 @@ public class AdminDAO extends DAO {
 
         }catch (SQLException sqle){
             logger.error("Error unmuting user");
+        } finally {
+            try {
+                if (ps != null) {
+                    ps.close();
+                }
+            } catch (SQLException sqle){
+                logger.error("Error while closing ps or rs",sqle);
+            }
         }
         logger.debug("mute - end : result=<"+result+">");
         return result;
@@ -133,6 +149,14 @@ public class AdminDAO extends DAO {
 
         }catch (SQLException sqle){
             logger.error("Error shaming user");
+        } finally {
+            try {
+                if (ps != null) {
+                    ps.close();
+                }
+            } catch (SQLException sqle){
+                logger.error("Error while closing ps or rs",sqle);
+            }
         }
         logger.debug("shame - end : result=<"+result+">");
         return result;
@@ -159,6 +183,14 @@ public class AdminDAO extends DAO {
 
         }catch (SQLException sqle){
             logger.error("Error unshaming user");
+        } finally {
+            try {
+                if (ps != null) {
+                    ps.close();
+                }
+            } catch (SQLException sqle){
+                logger.error("Error while closing ps or rs",sqle);
+            }
         }
         logger.debug("shame - end : result=<"+result+">");
         return result;
@@ -233,6 +265,14 @@ public class AdminDAO extends DAO {
 
         }catch (SQLException sqle){
             logger.error("Error slow");
+        } finally {
+            try {
+                if (ps != null) {
+                    ps.close();
+                }
+            } catch (SQLException sqle){
+                logger.error("Error while closing ps or rs",sqle);
+            }
         }
         logger.debug("slow - end : result=<"+result+">");
         return result;
@@ -259,6 +299,14 @@ public class AdminDAO extends DAO {
 
         }catch (SQLException sqle){
             logger.error("Error slowUpdate");
+        } finally {
+            try {
+                if (ps != null) {
+                    ps.close();
+                }
+            } catch (SQLException sqle){
+                logger.error("Error while closing ps or rs",sqle);
+            }
         }
         logger.debug("slowUpdate - end : result=<"+result+">");
         return result;
@@ -283,6 +331,14 @@ public class AdminDAO extends DAO {
 
         }catch (SQLException sqle){
             logger.error("Error slowDelete");
+        } finally {
+            try {
+                if (ps != null) {
+                    ps.close();
+                }
+            } catch (SQLException sqle){
+                logger.error("Error while closing ps or rs",sqle);
+            }
         }
         logger.debug("slowDelete - end : result=<"+result+">");
         return result;

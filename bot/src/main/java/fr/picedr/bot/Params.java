@@ -39,6 +39,8 @@ public class Params {
     public static String SRV_SHAME = "shame";
     public static String SRV_SLOW = "slow";
     public static String SRV_CLEAR = "clear";
+    public static String SRV_AGENDA = "agenda";
+    public static String SRV_ANNIV="anniv";
 
     public static Hashtable<String, String> SRV_DESC;
     static {
@@ -48,6 +50,8 @@ public class Params {
         SRV_DESC.put(SRV_SHAME,"Banni un utilisateur sur un voice chan à part");
         SRV_DESC.put(SRV_SLOW,"Permet de ralentir le rythme de message sur un chan");
         SRV_DESC.put(SRV_CLEAR,"Permet d'effacer **x** messages sur un chan");
+        SRV_DESC.put(SRV_AGENDA,"Gestion d'évenements avec rappels");
+        SRV_DESC.put(SRV_ANNIV,"Gestion des anniversaires");
     }
 
 
