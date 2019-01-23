@@ -23,9 +23,9 @@ public class AgendaService implements BotService {
     private Logger logger = LoggerFactory.getLogger(AgendaService.class);
 
     private static AgendaService INSTANCE = null;
-    public static String TYPE_AGENDA = "agenda";
-    public static String TYPE_AGENDAD = "agendad";
-    public static String TYPE_ANNIV = "anniv";
+    static String TYPE_AGENDA = "agenda";
+    static String TYPE_AGENDAD = "agendad";
+    private static String TYPE_ANNIV = "anniv";
 
     private AgendaService(){
 
@@ -58,7 +58,7 @@ public class AgendaService implements BotService {
                case "!rappel":
                    switch (function){
                        case "rem" :
-
+                           remRappel(server,channel, msg, user, content);
                            break;
                        default :
                            rappel(server,channel,user,msg,content);
@@ -68,7 +68,7 @@ public class AgendaService implements BotService {
                case "!agenda":
                    switch (function) {
                        case "add":
-                           add(server, channel, msg,user, content);
+                           add(server, channel, msg,user,cmd, content);
                            break;
                        case "rem":
                            rem(server,channel,msg,user,content);
@@ -84,8 +84,29 @@ public class AgendaService implements BotService {
                            if (channel == null) {
                                MsgUtils.tell(user, "Je ne connais pas cette commande.");
                            } else {
-                               MsgUtils.tell(channel, "Je ne connais pas cette commande. Tappe **!help agenda** pour plus de details");
+                               MsgUtils.tell(channel, "Je ne connais pas cette commande. Tappe **!help agenda** pour plus de details",0);
                            }
+                   }
+                   break;
+               case "!anniv" :
+                   switch (function) {
+                       case "add":
+                           add(server, channel, msg,user,cmd, content);
+                           break;
+                       case "rem":
+                           rem(server,channel,msg,user,content);
+                           break;
+                       case "" :
+                           wishAnnivs(server,channel);
+                           break;
+                       default :
+                           logger.debug("default function");
+                           if (channel == null) {
+                               MsgUtils.tell(user, "Je ne connais pas cette commande.");
+                           } else {
+                               MsgUtils.tell(channel, "Je ne connais pas cette commande. Tappe **!help agenda** pour plus de details",0);
+                           }
+
                    }
                    break;
                default :
@@ -93,7 +114,7 @@ public class AgendaService implements BotService {
                    if (channel == null) {
                        MsgUtils.tell(user, "Je ne connais pas cette commande.");
                    } else {
-                       MsgUtils.tell(channel, "Je ne connais pas cette commande. Tappe **!help agenda** pour plus de details");
+                       MsgUtils.tell(channel, "Je ne connais pas cette commande. Tappe **!help agenda** pour plus de details",0);
                    }
 
            }
@@ -115,24 +136,40 @@ public class AgendaService implements BotService {
     public static void help(Guild server, TextChannel channel) {
         List<String> tell = new ArrayList<>();
 
-        tell.add("AIDE POUR LA SECTION [AGENDA]");
-        tell.add(" ");
-        tell.add("Le service [agenda] permet de gérer et d'afficher des évenements avec des rappels.");
-        tell.add("Les commandes disponibles sont : ");
+        Bot bot = Bot.getInstance();
+        if (bot.getServices().get(server.getId()).get(Params.SRV_AGENDA).equals("1")) {
 
-        tell.add("- !agenda : Liste les évenements de la journée.");
-        if (channel.getId().equals(Bot.getInstance().getServersConf().get(server.getId()).get(Params.CONF_ADMINCHANNEL))) {
-            tell.add("- !agenda add jj/mm/aaaa hh/mm <titre> : ajoute un évenement.");
-            tell.add("- !agenda add jj/mm/aaaa <titre> : ajoute un évenement pour une journée entière.");
-            tell.add("- !agenda rem <id> : supprime l'évenement.");
-            tell.add("- !agenda list : Liste tous les évenement.");
-            tell.add("- !rappel <id> liste de rappels : ajoute un ou des rappels à l'évenement <id>.");
-            tell.add("- !rappel rem <id> : supprime le rappel.");
-            tell.add("Les rappels peuvent être de la forme **Xm** (minutes), **Xh** (heures) ou **Xj** (jours)");
+            tell.add("AIDE POUR LA SECTION [AGENDA]");
+            tell.add(" ");
+            tell.add("#EVENEMENT");
+            tell.add("Permet de gérer et d'afficher des évenements avec des rappels.");
+            tell.add("Les commandes disponibles sont : ");
+
+            tell.add("- !agenda : Liste les évenements de la journée.");
+            if (channel.getId().equals(Bot.getInstance().getServersConf().get(server.getId()).get(Params.CONF_ADMINCHANNEL))) {
+                tell.add("- !agenda add jj/mm/aaaa hh/mm <titre> : ajoute un évenement.");
+                tell.add("- !agenda add jj/mm/aaaa <titre> : ajoute un évenement pour une journée entière.");
+                tell.add("- !agenda rem <id> : supprime l'évenement.");
+                tell.add("- !agenda list : Liste tous les évenement.");
+                tell.add("- !rappel <id> liste de rappels : ajoute un ou des rappels à l'évenement <id>.");
+                tell.add("- !rappel rem <id> : supprime le rappel.");
+                tell.add("Les rappels peuvent être de la forme **Xm** (minutes), **Xh** (heures) ou **Xj** (jours)");
+            }
+
+            tell.add(" ");
+            tell.add("#ANNIV");
+            tell.add("Permet de gérer et d'afficher anniversaires.");
+            tell.add("Les commandes disponibles sont : ");
+
+            tell.add("- !anniv : Souhaite l'anniversaire de la ou des personnes dont c'est l'anniversaire.");
+            if (channel.getId().equals(Bot.getInstance().getServersConf().get(server.getId()).get(Params.CONF_ADMINCHANNEL))) {
+                tell.add("- !anniv add jj/mm <Nom> : ajoute l'anniversaire pour *Nom*");
+                tell.add("- !agenda list : un anniversaire est un evenement et donc peut être vu dans la liste des évenements");
+                tell.add("- !agenda rem <id> : Il est supprimé aussi comme un évenement.");
+            }
+
+            MsgUtils.tellBlockFramed(channel, tell, MsgUtils.FT_CSS);
         }
-
-
-        MsgUtils.tellBlockFramed(channel, tell, MsgUtils.FT_CSS);
     }
 
 
@@ -142,10 +179,11 @@ public class AgendaService implements BotService {
      * @param chan chan on which the command has been launched
      * @param user tha launch the command
      * @param msg message that launched the command
+     * @param cmd  to know if is agenda or anniv
      * @param content content of the command
      */
-    private void add(Guild server, TextChannel chan, Message msg,User user, String content){
-        logger.debug("add - start : server=<"+server.getName()+"> - chan=<"+chan.getName()+"> - content=<"+content+">");
+    private void add(Guild server, TextChannel chan, Message msg,User user,String cmd, String content){
+        logger.debug("add - start : server=<"+server.getName()+"> - chan=<"+chan.getName()+"> - cmd=<"+cmd+"> - content=<"+content+">");
 
         if (chan.getId().equals(Bot.getInstance().getServersConf().get(server.getId()).get(Params.CONF_ADMINCHANNEL))) {
             logger.debug("is admin channel");
@@ -158,21 +196,32 @@ public class AgendaService implements BotService {
             if (params.length<3 ){
                 List<String> tell = new ArrayList<>();
                 tell.add("Le format de la commande est : ");
-                tell.add("**!agenda add jj/mm/aaaa hh:mm <titre>**");
-                tell.add("ou **!agenda add jj/mm/aaaa <titre>** pour un évenement sur toute une journée.");
+                if (cmd.equals("!anniv")){
+                    tell.add("**!anniv add jj/mm <nom>**");
+                } else {
+                    tell.add("**!agenda add jj/mm/aaaa hh:mm <titre>**");
+                    tell.add("ou **!agenda add jj/mm/aaaa <titre>** pour un évenement sur toute une journée.");
+                }
                 MsgUtils.tellBlock(chan,tell);
             }else if (params.length==3){
                 dateE = params[1];
                 title = content.replace("add "+params[1],"").trim();
             }else{
-                if (params[2].contains(":") && params[2].length()<=5){
-                    dateE = params[1];
-                    time = params[2];
-                    title = content.replace("add "+params[1]+" "+params[2],"").trim();
-
+                if (cmd.equals("!anniv")){
+                    List<String> tell = new ArrayList<>();
+                    tell.add("Le format de la commande est : ");
+                    tell.add("**!anniv add jj/mm <nom>**");
+                    MsgUtils.tellBlock(chan,tell);
                 }else {
-                    dateE = params[1];
-                    title = content.replace("add "+params[1],"").trim();
+                    if (params[2].contains(":") && params[2].length() <= 5) {
+                        dateE = params[1];
+                        time = params[2];
+                        title = content.replace("add " + params[1] + " " + params[2], "").trim();
+
+                    } else {
+                        dateE = params[1];
+                        title = content.replace("add " + params[1], "").trim();
+                    }
                 }
             }
             logger.debug("title=<"+title+"> - dateE=<"+dateE+"> - time=<"+time+">");
@@ -188,75 +237,123 @@ public class AgendaService implements BotService {
 
 
             logger.debug("spDate length = "+spDate.length);
-            if (spDate.length != 3){
-                MsgUtils.tell(chan, "La date doit être au format jj/mm/aaaa");
-                dateOK = false;
-            }else {
-                try {
-                    year = new Integer(spDate[2]);
-                    month = new Integer(spDate[1]);
-                    day = new Integer(spDate[0]);
-                }catch (NumberFormatException nfe){
-                    MsgUtils.tell(chan,"La date doit être au format jj/mm/aaaa");
-                    dateOK = false;
-                    logger.debug("Bad number format in date");
-                }
 
-                try {
-                    if (!time.equals("")){
-                        String[] spTime = time.trim().split(":");
-                        hour=new Integer(spTime[0]);
-                        min = new Integer(spTime[1]);
-                    }
-                }catch (NumberFormatException nfe){
-                    MsgUtils.tell(chan,"L'heure doit être au format hh:mm");
-                    dateOK = false;
-                    logger.debug("Bad number format in time");
-                }
-
-                logger.debug("dateOK : "+dateOK);
-                if (dateOK) {
-                    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-                    String s = "";
-                    if (day<10) {
-                        s=s.concat("0");
-                    }
-                    s=s.concat(day+"/");
-                    if (month<10) {
-                        s=s.concat("0");
-                    }
-                    s=s.concat(month+"/"+year+ " ");
-                    if (hour<10) {
-                        s=s.concat("0");
-                    }
-                    s=s.concat(hour+":");
-                    if (min<10) {
-                        s=s.concat("0");
-                    }
-                    s=s.concat(String.valueOf(min));
-                    logger.debug("s=<"+s+">");
+            if (cmd.equals("!anniv")){
+                if (spDate.length != 2) {
+                    MsgUtils.tell(chan, "La date doit être au format jj/mm");
+                } else {
                     try {
-                        d = sdf.parse(s);
-                        String t = sdf.format(d);
-                        if (t.compareTo(s) != 0) {
-                            MsgUtils.tell(chan,"Date/heure non valide");
-                            dateOK = false;
-                            logger.debug("s!=t");
-                        }
-                    } catch (Exception e) {
-                        MsgUtils.tell(chan,"Date/heure non valide");
+                        month = new Integer(spDate[1]);
+                        day = new Integer(spDate[0]);
+                    } catch (NumberFormatException nfe) {
+                        MsgUtils.tell(chan, "La date doit être au format jj/mm");
                         dateOK = false;
-                        logger.debug("Error in date check");
+                        logger.debug("Bad number format in date");
+                    }
+
+                    logger.debug("dateOK : " + dateOK);
+                    if (dateOK) {
+                        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+                        String s = "";
+                        if (day < 10) {
+                            s = s.concat("0");
+                        }
+                        s = s.concat(day + "/");
+                        if (month < 10) {
+                            s = s.concat("0");
+                        }
+                        s = s.concat(String.valueOf(month)+"/1999");
+                        logger.debug("s=<" + s + ">");
+                        try {
+                            d = sdf.parse(s);
+                            String t = sdf.format(d);
+                            if (t.compareTo(s) != 0) {
+                                MsgUtils.tell(chan, "Date non valide");
+                                dateOK = false;
+                                logger.debug("s!=t");
+                            }
+                        } catch (Exception e) {
+                            MsgUtils.tell(chan, "Date non valide");
+                            dateOK = false;
+                            logger.debug("Error in date check");
+                        }
+                    }
+
+                }
+            } else {
+                if (spDate.length != 3) {
+                    MsgUtils.tell(chan, "La date doit être au format jj/mm/aaaa");
+                    dateOK = false;
+                } else {
+                    try {
+                        year = new Integer(spDate[2]);
+                        month = new Integer(spDate[1]);
+                        day = new Integer(spDate[0]);
+                    } catch (NumberFormatException nfe) {
+                        MsgUtils.tell(chan, "La date doit être au format jj/mm/aaaa");
+                        dateOK = false;
+                        logger.debug("Bad number format in date");
+                    }
+
+                    try {
+                        if (!time.equals("")) {
+                            String[] spTime = time.trim().split(":");
+                            hour = new Integer(spTime[0]);
+                            min = new Integer(spTime[1]);
+                        }
+                    } catch (NumberFormatException nfe) {
+                        MsgUtils.tell(chan, "L'heure doit être au format hh:mm", 0);
+                        dateOK = false;
+                        logger.debug("Bad number format in time");
+                    }
+
+                    logger.debug("dateOK : " + dateOK);
+                    if (dateOK) {
+                        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+                        String s = "";
+                        if (day < 10) {
+                            s = s.concat("0");
+                        }
+                        s = s.concat(day + "/");
+                        if (month < 10) {
+                            s = s.concat("0");
+                        }
+                        s = s.concat(month + "/" + year + " ");
+                        if (hour < 10) {
+                            s = s.concat("0");
+                        }
+                        s = s.concat(hour + ":");
+                        if (min < 10) {
+                            s = s.concat("0");
+                        }
+                        s = s.concat(String.valueOf(min));
+                        logger.debug("s=<" + s + ">");
+                        try {
+                            d = sdf.parse(s);
+                            String t = sdf.format(d);
+                            if (t.compareTo(s) != 0) {
+                                MsgUtils.tell(chan, "Date/heure non valide", 0);
+                                dateOK = false;
+                                logger.debug("s!=t");
+                            }
+                        } catch (Exception e) {
+                            MsgUtils.tell(chan, "Date/heure non valide", 0);
+                            dateOK = false;
+                            logger.debug("Error in date check");
+                        }
                     }
                 }
-
-
             }
             logger.debug("dateOK="+dateOK);
             if (dateOK){
+
                 String type= TYPE_AGENDA;
                 if (time.equals("")) {
                     type= TYPE_AGENDAD;
+                }
+
+                if (cmd.equals("!anniv")){
+                    type = TYPE_ANNIV;
                 }
 
                 AgendaDAO agendaDAO = new AgendaDAO();
@@ -265,6 +362,7 @@ public class AgendaService implements BotService {
 
                 if (nb > 0) {
                     List<String> tell = new ArrayList<>();
+
                     tell.add("L'évenement suivant a été ajouté : ");
                     tell.add("<id> : " + nb );
                     tell.add("<date> : " + dateE.split(" ")[0]);
@@ -305,12 +403,12 @@ public class AgendaService implements BotService {
                 id = Integer.valueOf(content.replace("rem ","").trim());
             } catch (NumberFormatException nfe){
                 logger.debug("The parameter is not a number");
-                MsgUtils.tell(chan,"L'id doit être un nombre");
+                MsgUtils.tell(chan,"L'id doit être un nombre",0);
             }
             if (id>0) {
                 int nb = agendaDAO.deleteEntry(id,server.getId());
                 if (nb>0){
-                    MsgUtils.tell(chan,"L'évenement **"+id+"** a été supprimé");
+                    MsgUtils.tell(chan,"L'évenement **"+id+"** a été supprimé",0);
                 }
 
             }
@@ -344,7 +442,7 @@ public class AgendaService implements BotService {
 
             }catch (NumberFormatException nfe){
                 logger.debug("bad ID format");
-                MsgUtils.tell(chan,"L'id doit être un nombre : <"+params[1]+">. **!help agenda** pour plus d'information.");
+                MsgUtils.tell(chan,"L'id doit être un nombre : <"+params[1]+">. **!help agenda** pour plus d'information.",0);
             }
 
             if (id>0){
@@ -359,7 +457,7 @@ public class AgendaService implements BotService {
                             try{
                                 val=new Integer(rap.substring(0,rap.length()-1));
                             }catch (NumberFormatException nfe){
-                                MsgUtils.tell(chan, "Rappel non valide **"+rap+"**. Formats acceptés : **Xm**, **Xh** ou **Xj**.");
+                                MsgUtils.tell(chan, "Rappel non valide **"+rap+"**. Formats acceptés : **Xm**, **Xh** ou **Xj**.",0);
                             }
 
                             if (val>0){
@@ -378,16 +476,16 @@ public class AgendaService implements BotService {
                                     if (event.getType().equals(TYPE_AGENDAD)){
                                         sdf = new SimpleDateFormat("dd/MM/yyyy");
                                     }
-                                    MsgUtils.tell(chan,"Un rappel a été ajouté pour l'évenement **"+event.getContent()+"** le **"+sdf.format(cal.getTime())+"**");
+                                    MsgUtils.tell(chan,"Un rappel a été ajouté pour l'évenement **"+event.getContent()+"** le **"+sdf.format(cal.getTime())+"**",0);
                                 }
 
                             }
                         }else {
-                            MsgUtils.tell(chan, "Rappel non valide **"+rap+"**. Formats acceptés : **Xm**, **Xh** ou **Xj**.");
+                            MsgUtils.tell(chan, "Rappel non valide **"+rap+"**. Formats acceptés : **Xm**, **Xh** ou **Xj**.",0);
                         }
                     }
                 }else {
-                    MsgUtils.tell(chan,"Cet id n'existe pas pour ce serveur.");
+                    MsgUtils.tell(chan,"Cet id n'existe pas pour ce serveur.",0);
                 }
             }
         }else {
@@ -419,12 +517,12 @@ public class AgendaService implements BotService {
                 id = Integer.valueOf(content.replace("rem ","").trim());
             } catch (NumberFormatException nfe){
                 logger.debug("The parameter is not a number");
-                MsgUtils.tell(chan,"L'id doit être un nombre");
+                MsgUtils.tell(chan,"L'id doit être un nombre",0);
             }
             if (id>0) {
                 int nb = agendaDAO.deleteRappel(id,server.getId());
                 if (nb>0){
-                    MsgUtils.tell(chan,"Le rappel **"+id+"** a été supprimé");
+                    MsgUtils.tell(chan,"Le rappel **"+id+"** a été supprimé",0);
                 }
 
             }
@@ -457,11 +555,17 @@ public class AgendaService implements BotService {
             List<String> tell = new ArrayList<>();
             tell.add("Les évenement suivant sont listés :");
             for (Event event : events){
-                tell.add("["+event.getContent()+"]");
+                if (event.getType().equals(TYPE_ANNIV)){
+                    tell.add("[Anniversaire de " + event.getContent() + "]");
+                }else {
+                    tell.add("[" + event.getContent() + "]");
+                }
                 tell.add("<id> : "+event.getId());
                 SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
                 if (event.getType().equals(TYPE_AGENDAD)){
                     sdf = new SimpleDateFormat("dd/MM/yyyy");
+                } else if(event.getType().equals(TYPE_ANNIV)){
+                    sdf = new SimpleDateFormat("dd/MM");
                 }
                 tell.add("<date> : "+sdf.format(event.getDate()));
                 tell.add("<Rappels> :");
@@ -472,7 +576,7 @@ public class AgendaService implements BotService {
                 tell.add(" ");
             }
 
-            MsgUtils.tellBlockFramed(chan,tell,MsgUtils.FT_CSS);
+            MsgUtils.tellBlockFramed(chan,tell,MsgUtils.FT_CSS,0);
 
 
         }else {
@@ -534,9 +638,9 @@ public class AgendaService implements BotService {
         }
         logger.debug("tell size="+tell.size());
         if (tell.size()>0){
-            MsgUtils.tellBlock(channel, tell);
+            MsgUtils.tellBlock(channel, tell,0);
         }else{
-            MsgUtils.tell(channel,"Aucun évenement de programmé.");
+            MsgUtils.tell(channel,"Aucun évenement de programmé.",0);
         }
 
         logger.debug("today - end");
@@ -555,7 +659,7 @@ public class AgendaService implements BotService {
         for (Event event : events){
             logger.debug("event=<"+event.getId()+">");
             TextChannel channel = bot.getJDA().getTextChannelById(bot.getServersConf().get(event.getServerId()).get(Params.CONF_GENERALCHANNEL));
-            MsgUtils.tell(channel,"L'évenement **"+event.getContent()+"** débute maintenant");
+            MsgUtils.tell(channel,"L'évenement **"+event.getContent()+"** débute maintenant",0);
         }
 
         List<Event> rappels = agendaDAO.getRappelsNow(date);
@@ -565,10 +669,39 @@ public class AgendaService implements BotService {
             TextChannel channel = bot.getJDA().getTextChannelById(bot.getServersConf().get(event.getServerId()).get(Params.CONF_GENERALCHANNEL));
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
             SimpleDateFormat sdf2 = new SimpleDateFormat("HH:mm");
-            MsgUtils.tell(channel,"L'évenement **"+event.getContent()+"** aura lieu le "+sdf.format(event.getDate())+" à "+sdf2.format(event.getDate()+"."));
+            MsgUtils.tell(channel,"L'évenement **"+event.getContent()+"** aura lieu le "+sdf.format(event.getDate())+" à "+sdf2.format(event.getDate()+"."),0);
         }
 
         logger.debug("now - stop");
+    }
+
+    /**
+     *  Display birthday of the day
+     */
+    public void wishAnnivs(Guild server, TextChannel channel){
+        logger.debug("wishAnnivs - start : server=<"+server.getName()+"> - channel = <"+channel.getName()+">");
+        AgendaDAO agendaDAO = new AgendaDAO();
+        List<Event> bds = agendaDAO.getAllEvents(server.getId());
+        SimpleDateFormat sdf = new SimpleDateFormat("MMdd");
+        Date date = Calendar.getInstance().getTime();
+        bds.stream()
+                .filter(e -> e.getType().equals(TYPE_ANNIV))
+                .filter(e-> sdf.format(e.getDate()).equals(sdf.format(date)))
+                .forEach(e -> wishAnniv(e.getContent(),channel));
+
+        logger.debug("wishAnnivs - end");
+    }
+
+    /**
+     * Sing happy birthday
+     * @param userName : user for who to sing
+     * @param channel : channel to sing on
+     */
+    private void wishAnniv(String userName, TextChannel channel){
+        MsgUtils.tell(channel,"♫♪♪ Joyeux aaanniiiiveeeraiiiiire ♫♪♪",1);
+        MsgUtils.tell(channel,"♫♪♪ Joyeux aaanniiiiveeeraiiiiire ♫♪♪",1);
+        MsgUtils.tell(channel,"♫♪♪ Joyeux aaanniiiiveeeraiiiiire "+userName+" ♫♪♪",1);
+        MsgUtils.tell(channel,"♫♪♪ Joyeux aaaaaaaaaaaaaanniiiiiiiiiiiiveeeeeeeeeeeeraiiiiiiiiiiiiiire ♫♪♪",1);
     }
 
     /**

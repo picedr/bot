@@ -3,7 +3,6 @@ package fr.picedr.bot;
 import java.util.Calendar;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Map;
 
 import fr.picedr.bot.agenda.AgendaService;
 import fr.picedr.bot.dao.BotDAO;
@@ -82,7 +81,7 @@ public class Bot {
 			jda.addEventListener(new MiscListener());
 			jda.getPresence().setGame(null);
 
-			MsgUtils.tell(jda.getTextChannelById("439298603371069448"),"Salut !");
+			MsgUtils.tell(jda.getTextChannelById("439298603371069448"),"Salut !",Params.DEFAUL_TYPING_DELAY);
 			
 			/*
 			 *Loop every second :
@@ -106,7 +105,9 @@ public class Bot {
 
 				if (newH){
 					switch (hour){
-						case 0:
+						case 1:
+							AgendaService.getInstance().clear(Calendar.getInstance().getTime());
+						case 6:
 							for (String key: services.keySet()) {
 								if (services.get(key).get(Params.SRV_AGENDA).equals("1")){
 									Guild server = jda.getGuildById(key);
@@ -114,7 +115,17 @@ public class Bot {
 									AgendaService.getInstance().today(server,chan);
 								}
 
-							};
+							}
+							break;
+						case 7 :
+							for (String key: services.keySet()) {
+								if (services.get(key).get(Params.SRV_AGENDA).equals("1")){
+									Guild server = jda.getGuildById(key);
+									TextChannel chan = jda.getTextChannelById(serversConf.get(key).get(Params.CONF_GENERALCHANNEL));
+									AgendaService.getInstance().wishAnnivs(server,chan);
+								}
+
+							}
 							break;
 						default:
 					}

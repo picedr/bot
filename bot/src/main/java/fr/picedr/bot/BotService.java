@@ -12,7 +12,7 @@ public interface BotService {
     /**
      * Dispatch the command passed to the service
      * @param server : Server from which come the command
-     * @param channnel : Channel from wich come the commande
+     * @param channel : Channel from wich come the commande
      * @param user : user that launch the command
      * @param cmd : command
      * @param content : parameters of the command
@@ -25,7 +25,7 @@ public interface BotService {
      * @param server : server which called the help
      */
     public static void help(Guild server, TextChannel channel){
-        MsgUtils.tell(channel,"Aucune aide pour cette fonctionnalité");
+        MsgUtils.tell(channel,"Aucune aide pour cette fonctionnalité",0);
     }
 
 

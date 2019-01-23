@@ -143,7 +143,7 @@ public class AdminService implements BotService {
                 if (channel == null) {
                     MsgUtils.tell(user, "Je ne connais pas cette commande.");
                 } else {
-                    MsgUtils.tell(channel, "Je ne connais pas cette commande. Tappe **!help admin** pour plus de details");
+                    MsgUtils.tell(channel, "Je ne connais pas cette commande. Tappe **!help admin** pour plus de details",0);
                 }
         }
         logger.debug("dispatch - end");
@@ -207,8 +207,9 @@ public class AdminService implements BotService {
                 tell.add("- !clear [nb]: supprime les [nb] dernières ligne du chan (en cas de reboot du bot, l'historique est perdu).");
             }
 
+
         }
-        MsgUtils.tellBlockFramed(channel, tell, MsgUtils.FT_CSS);
+        MsgUtils.tellBlockFramed(channel, tell, MsgUtils.FT_CSS,0);
     }
 
     /**
@@ -227,7 +228,7 @@ public class AdminService implements BotService {
                 tell.add("Ce service ne peut être activé tant qu'aucun **rôle d'administrateur** n'est défini.");
                 tell.add("Pour cela, il suffit de lancer la commande :");
                 tell.add("- !conf "+Params.CONF_ADMINROLE+" **idDuRole**");
-                MsgUtils.tellBlock(channel,tell);
+                MsgUtils.tellBlock(channel,tell,0);
                 result = false;
             }
         }else if (service.equals(Params.SRV_TELL)){
@@ -237,7 +238,7 @@ public class AdminService implements BotService {
                 tell.add("Ce service ne peut être activé tant qu'un **chan général** n'est pas défini.");
                 tell.add("Pour cela, il suffit de lancer la commande :");
                 tell.add("- !conf "+Params.CONF_GENERALCHANNEL+" **idDuChan**");
-                MsgUtils.tellBlock(channel,tell);
+                MsgUtils.tellBlock(channel,tell,0);
                 result = false;
             }
         }  else if (service.equals(Params.SRV_SHAME)) {
@@ -247,7 +248,7 @@ public class AdminService implements BotService {
                 tell.add("Ce service ne peut être activé tant qu'un **chan shame** n'est pas défini.");
                 tell.add("Pour cela, il suffit de lancer la commande :");
                 tell.add("- !conf " + Params.CONF_SHAMECHANNEL + " **idDuChan**");
-                MsgUtils.tellBlock(channel, tell);
+                MsgUtils.tellBlock(channel, tell,0);
                 result = false;
             }
             if (!Bot.getInstance().getServersConf().get(server.getId()).containsKey(Params.CONF_VOICEROLE)) {
@@ -256,7 +257,7 @@ public class AdminService implements BotService {
                 tell.add("Ce service ne peut être activé tant qu'aucun **rôle VOICE** n'est défini.");
                 tell.add("Pour cela, il suffit de lancer la commande :");
                 tell.add("- !conf " + Params.CONF_VOICEROLE + " **idDuRole**");
-                MsgUtils.tellBlock(channel, tell);
+                MsgUtils.tellBlock(channel, tell,0);
                 result = false;
             }
         }else if (service.equals(Params.SRV_SLOW)){
@@ -266,7 +267,7 @@ public class AdminService implements BotService {
                 tell.add("Ce service ne peut être activé tant qu'aucun **rôle d'administrateur** n'est défini.");
                 tell.add("Pour cela, il suffit de lancer la commande :");
                 tell.add("- !conf "+Params.CONF_ADMINROLE+" **idDuRole**");
-                MsgUtils.tellBlock(channel,tell);
+                MsgUtils.tellBlock(channel,tell,0);
                 result = false;
             }
         }else if (service.equals(Params.SRV_CLEAR)){
@@ -276,7 +277,7 @@ public class AdminService implements BotService {
                 tell.add("Ce service ne peut être activé tant qu'aucun **rôle d'administrateur** n'est défini.");
                 tell.add("Pour cela, il suffit de lancer la commande :");
                 tell.add("- !conf "+Params.CONF_ADMINROLE+" **idDuRole**");
-                MsgUtils.tellBlock(channel,tell);
+                MsgUtils.tellBlock(channel,tell,0);
                 result = false;
             }
         }else if (service.equals(Params.SRV_AGENDA)){
@@ -286,7 +287,35 @@ public class AdminService implements BotService {
                 tell.add("Ce service ne peut être activé tant qu'un **chan général** n'est pas défini.");
                 tell.add("Pour cela, il suffit de lancer la commande :");
                 tell.add("- !conf "+Params.CONF_GENERALCHANNEL+" **idDuChan**");
-                MsgUtils.tellBlock(channel,tell);
+                MsgUtils.tellBlock(channel,tell,0);
+                result = false;
+            }
+        }else if (service.equals(Params.SRV_CMD)){
+            if (!Bot.getInstance().getServersConf().get(server.getId()).containsKey(Params.CONF_ADMINCHANNEL)){
+                logger.debug("No "+Params.CONF_ADMINCHANNEL);
+                List<String> tell = new ArrayList<>();
+                tell.add("Ce service ne peut être activé tant qu'un **chan admin** n'est pas défini.");
+                tell.add("Pour cela, il suffit de lancer la commande :");
+                tell.add("- !conf "+Params.CONF_ADMINCHANNEL+" **idDuChan**");
+                MsgUtils.tellBlock(channel,tell,0);
+                result = false;
+            }
+        }else if (service.equals(Params.SRV_JEUX)){
+            if (!Bot.getInstance().getServersConf().get(server.getId()).containsKey(Params.CONF_ADMINCHANNEL)){
+                logger.debug("No "+Params.CONF_ADMINCHANNEL);
+                List<String> tell = new ArrayList<>();
+                tell.add("Ce service ne peut être activé tant qu'un **chan admin** n'est pas défini.");
+                tell.add("Pour cela, il suffit de lancer la commande :");
+                tell.add("- !conf "+Params.CONF_ADMINCHANNEL+" **idDuChan**");
+                MsgUtils.tellBlock(channel,tell,0);
+                result = false;
+            } else if (!Bot.getInstance().getServersConf().get(server.getId()).containsKey(Params.CONF_GENERALCHANNEL)){
+                logger.debug("No "+Params.CONF_GENERALCHANNEL);
+                List<String> tell = new ArrayList<>();
+                tell.add("Ce service ne peut être activé tant qu'un **chan général** n'est pas défini.");
+                tell.add("Pour cela, il suffit de lancer la commande :");
+                tell.add("- !conf "+Params.CONF_GENERALCHANNEL+" **idDuChan**");
+                MsgUtils.tellBlock(channel,tell,0);
                 result = false;
             }
         }
@@ -325,10 +354,10 @@ public class AdminService implements BotService {
                     logger.debug("line = <" + line + ">");
                     tell.add(line);
                 });
-                MsgUtils.tellBlockFramed(chan, tell, MsgUtils.FT_CSS);
+                MsgUtils.tellBlockFramed(chan, tell, MsgUtils.FT_CSS,0);
             } else {
                 logger.debug("No parameter needed for this service");
-                MsgUtils.tell(chan, "La commande **!services** ne prend pas de paramètre");
+                MsgUtils.tell(chan, "La commande **!services** ne prend pas de paramètre",0);
             }
         } else {
             logger.debug("is not admin channel");
@@ -356,12 +385,12 @@ public class AdminService implements BotService {
                     logger.debug("state = <" + state + ">");
                     if (state.equals("-1")) {
                         logger.debug("State KO");
-                        MsgUtils.tell(chan, "Le deuxième paramètre doit être **on** ou **off**.");
+                        MsgUtils.tell(chan, "Le deuxième paramètre doit être **on** ou **off**.",0);
                     } else {
                         logger.debug("State OK");
                         if (Bot.getInstance().getServices().get(server.getId()).get(params[0]).equals(state)) {
                             logger.debug("No change on state");
-                            MsgUtils.tell(chan, "Le service **" + params[0] + "** est déjà à l'état " + params[1]);
+                            MsgUtils.tell(chan, "Le service **" + params[0] + "** est déjà à l'état " + params[1],0);
                         } else {
                             if (state.equals("0") || isServiceSetable(server,chan,params[0])) {
                                 logger.debug("Change the state");
@@ -376,7 +405,7 @@ public class AdminService implements BotService {
                                     } else {
                                         tell = tell + "**desactivé.**";
                                     }
-                                    MsgUtils.tell(chan, tell);
+                                    MsgUtils.tell(chan, tell,0);
                                 }
                             } else {
                                 logger.debug("The service is not setable");
@@ -391,10 +420,10 @@ public class AdminService implements BotService {
                     for (Map.Entry<String, String> entry : Params.SRV_DESC.entrySet()) {
                         tell.add("- " + entry.getKey());
                     }
-                    MsgUtils.tellBlock(chan, tell);
+                    MsgUtils.tellBlock(chan, tell,0);
                 }
             } else {
-                MsgUtils.tell(chan, "Commande incorrecte : !service <service name> <ON/OFF>");
+                MsgUtils.tell(chan, "Commande incorrecte : !service <service name> <ON/OFF>",0);
             }
         } else {
             logger.debug("is not admin channel");
@@ -418,10 +447,10 @@ public class AdminService implements BotService {
                     logger.debug("line = <" + line + ">");
                     tell.add(line);
                 });
-                MsgUtils.tellBlockFramed(chan, tell, MsgUtils.FT_CSS);
+                MsgUtils.tellBlockFramed(chan, tell, MsgUtils.FT_CSS,0);
             } else {
                 logger.debug("No parameter needed for this service");
-                MsgUtils.tell(chan, "La commande **!confs** ne prend pas de paramètre");
+                MsgUtils.tell(chan, "La commande **!confs** ne prend pas de paramètre",0);
             }
         } else {
             logger.debug("is not admin channel");
@@ -457,7 +486,7 @@ public class AdminService implements BotService {
                     }
                     if (res>0){
                         bot.getServersConf().get(server.getId()).put(confName,value);
-                        MsgUtils.tell(chan,tell);
+                        MsgUtils.tell(chan,tell,0);
                     }
                 } else {
                     logger.debug("Conf unknown");
@@ -466,10 +495,10 @@ public class AdminService implements BotService {
                     for (String value : Params.SERVER_CONF) {
                         tell.add("- "+ value);
                     }
-                    MsgUtils.tellBlock(chan,tell);
+                    MsgUtils.tellBlock(chan,tell,0);
                 }
             } else {
-                MsgUtils.tell(chan, "Commande incorrecte : !service <service name> <ON/OFF>");
+                MsgUtils.tell(chan, "Commande incorrecte : !service <service name> <ON/OFF>",0);
             }
         } else {
             logger.debug("is not admin channel");
@@ -493,7 +522,7 @@ public class AdminService implements BotService {
         if (UserUtils.isAdmin(server,author)){
             User mutedUser = UserUtils.getUserByName(server,user);
             if (mutedUser==null){
-                MsgUtils.tell(channel,"Je ne connais pas "+user);
+                MsgUtils.tell(channel,"Je ne connais pas "+user,0);
             } else {
 
                 if ((!muted.containsKey(server.getId()) ||
@@ -509,12 +538,12 @@ public class AdminService implements BotService {
                             users.add(mutedUser.getId());
                             muted.put(server.getId(),users);
                         }
-                        MsgUtils.tellFramed(channel,user+" ne peut plus parler",MsgUtils.FT_CSS);
+                        MsgUtils.tellFramed(channel,user+" ne peut plus parler",MsgUtils.FT_CSS,0);
                     }
                 }
             }
         }else {
-            MsgUtils.tell(channel, "Bien essayé, mais nan.");
+            MsgUtils.tell(channel, "Bien essayé, mais nan.",0);
         }
         logger.debug("mute - end");
     }
@@ -531,21 +560,21 @@ public class AdminService implements BotService {
         if (UserUtils.isAdmin(server,author)){
             User mutedUser = UserUtils.getUserByName(server,user);
             if (mutedUser==null){
-                MsgUtils.tell(channel,"Je ne connais pas "+user);
+                MsgUtils.tell(channel,"Je ne connais pas "+user,0);
             } else {
                 if (muted.get(server.getId()).contains(mutedUser.getId())) {
                     AdminDAO adminDAO = new AdminDAO();
                     int nb = adminDAO.unmute(server.getId(),mutedUser.getId());
                     if (nb>0) {
                         muted.get(server.getId()).remove(mutedUser.getId());
-                        MsgUtils.tellFramed(channel,user+" peut de nouveau parler",MsgUtils.FT_CSS);
+                        MsgUtils.tellFramed(channel,user+" peut de nouveau parler",MsgUtils.FT_CSS,0);
                     }
                 } else {
-                    MsgUtils.tell(channel,user+" n'est pas bloqué.");
+                    MsgUtils.tell(channel,user+" n'est pas bloqué.",0);
                 }
             }
         }else {
-            MsgUtils.tell(channel, "Bien essayé, mais nan.");
+            MsgUtils.tell(channel, "Bien essayé, mais nan.",0);
         }
         logger.debug("unmute - end");
     }
@@ -580,7 +609,7 @@ public class AdminService implements BotService {
         if (channel.getId().equals(Bot.getInstance().getServersConf().get(server.getId()).get(Params.CONF_ADMINCHANNEL))){
             logger.debug("Is admin channel");
             TextChannel general = server.getTextChannelById(Bot.getInstance().getServersConf().get(server.getId()).get(Params.CONF_GENERALCHANNEL));
-            MsgUtils.tell(general,content);
+            MsgUtils.tell(general,content,0);
         }else {
          logger.debug("Not admin channel");
          message.delete().complete();
@@ -623,7 +652,7 @@ public class AdminService implements BotService {
             logger.debug("tell : target=<"+target+">, msg=<"+msg+">");
             User destUser = UserUtils.getUserByName(server,target);
             if (destUser==null){
-                MsgUtils.tell(channel,"Je ne connais pas cet utilisateur");
+                MsgUtils.tell(channel,"Je ne connais pas cet utilisateur",0);
             }else {
                 MsgUtils.tell(destUser,msg);
             }
@@ -668,16 +697,16 @@ public class AdminService implements BotService {
                         VoiceChannel shameCh = server.getJDA().getVoiceChannelById(serverConf.get(Params.CONF_SHAMECHANNEL));
                         controller.moveVoiceMember(member, shameCh).complete();
                         controller.removeRolesFromMember(member,server.getRoleById(serverConf.get(Params.CONF_VOICEROLE))).complete();
-                        MsgUtils.tellFramed(channel, "Honte à toi [" + target.getName() + "]",MsgUtils.FT_CSS);
+                        MsgUtils.tellFramed(channel, "Honte à toi [" + target.getName() + "]",MsgUtils.FT_CSS,0);
                     }
                 }
             }else {
                 logger.debug("Target not found");
-                MsgUtils.tell(channel,content+" : utilisateur inconnu");
+                MsgUtils.tell(channel,content+" : utilisateur inconnu",0);
             }
         }else {
             logger.debug("Is not admin");
-            MsgUtils.tell(channel,"Bien essayé, mais nan.");
+            MsgUtils.tell(channel,"Bien essayé, mais nan.",0);
         }
         logger.debug("shame - end");
     }
@@ -711,14 +740,14 @@ public class AdminService implements BotService {
 
                     }
 
-                    MsgUtils.tellFramed(channel, "C'est bon ["+target.getName()+"] tu peux revenir.",MsgUtils.FT_CSS);
+                    MsgUtils.tellFramed(channel, "C'est bon ["+target.getName()+"] tu peux revenir.",MsgUtils.FT_CSS,0);
                 }
             }else {
                 logger.debug("Target not found");
-                MsgUtils.tell(channel,content+" : utilisateur inconnu");
+                MsgUtils.tell(channel,content+" : utilisateur inconnu",0);
             }
         }else {
-            MsgUtils.tell(channel, "Bien essayé, mais nan.");
+            MsgUtils.tell(channel, "Bien essayé, mais nan.",0);
         }
         logger.debug("unshame - end");
     }
@@ -773,7 +802,7 @@ public class AdminService implements BotService {
                 try{
                     delay = Integer.valueOf(content).intValue();
                 }catch (NumberFormatException nfe){
-                    MsgUtils.tell(channel,"Le paramètre de la fonction **!slow** doit être un nombre.");
+                    MsgUtils.tell(channel,"Le paramètre de la fonction **!slow** doit être un nombre.",0);
                     return;
                 }
             }
@@ -790,9 +819,9 @@ public class AdminService implements BotService {
                 slowDelays.put(channel.getId(), delay);
             }
 
-            MsgUtils.tellFramed(channel, "Le chan passe en slow mode : max 1 message toutes les "+delay+" secondes.",MsgUtils.FT_CSS);
+            MsgUtils.tellFramed(channel, "Le chan passe en slow mode : max 1 message toutes les "+delay+" secondes.",MsgUtils.FT_CSS,0);
         }else {
-            MsgUtils.tell(channel, "Bien essayé, mais nan.");
+            MsgUtils.tell(channel, "Bien essayé, mais nan.",0);
         }
         logger.debug("slow - end");
     }
@@ -814,13 +843,13 @@ public class AdminService implements BotService {
                     if (slowLastMsg.containsKey(channel.getId())){
                         slowLastMsg.remove(channel.getId());
                     }
-                    MsgUtils.tellFramed(channel,"Slow mode désactivé",MsgUtils.FT_CSS);
+                    MsgUtils.tellFramed(channel,"Slow mode désactivé",MsgUtils.FT_CSS,0);
                 }
             }else {
-                MsgUtils.tellFramed(channel,"Pas de slow mode activé sur ce chan.",MsgUtils.FT_CSS);
+                MsgUtils.tellFramed(channel,"Pas de slow mode activé sur ce chan.",MsgUtils.FT_CSS,0);
             }
         }else {
-            MsgUtils.tell(channel, "Bien essayé, mais nan.");
+            MsgUtils.tell(channel, "Bien essayé, mais nan.",0);
         }
         logger.debug("unslow - end");
     }

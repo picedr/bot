@@ -20,7 +20,7 @@ public class AdminDAO extends DAO {
      * @param userId : user muted
      * @return number of line added
      */
-    public int mute(String serverId, String userId){
+    int mute(String serverId, String userId){
         logger.debug("mute - start : serverId=<"+serverId+"> - userId=<"+userId+">");
         int result = 0;
         PreparedStatement ps = null;
@@ -54,7 +54,7 @@ public class AdminDAO extends DAO {
      * @param userId : user to unmute
      * @return : number of lines deleted
      */
-    public int unmute(String serverId, String userId){
+    int unmute(String serverId, String userId){
         logger.debug("unmute - start : serverId=<"+serverId+"> - userId=<"+userId+">");
         int result = 0;
         PreparedStatement ps = null;
@@ -356,7 +356,7 @@ public class AdminDAO extends DAO {
         ResultSet rs = null;
 
         try {
-            String query = "SELECT channelid, dely FROM slow;";
+            String query = "SELECT channelid, delay FROM slow;";
             ps = conn.prepareStatement(query);
             rs = ps.executeQuery();
 

@@ -5,7 +5,12 @@ import fr.picedr.bot.HelpService;
 import fr.picedr.bot.Params;
 import fr.picedr.bot.admin.AdminService;
 import fr.picedr.bot.agenda.AgendaService;
-import fr.picedr.bot.utils.MsgUtils;
+import fr.picedr.bot.command.CommandService;
+import fr.picedr.bot.jeux.JeuxService;
+import fr.picedr.bot.jeux.flood.FloodService;
+import fr.picedr.bot.jeux.pfc.PfcService;
+import fr.picedr.bot.jeux.pimp.PimpService;
+import fr.picedr.bot.jeux.quizz.QuizzService;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.TextChannel;
@@ -75,18 +80,43 @@ public class PublicListener implements EventListener {
                             break;
                         case "!agenda" :
                         case "!rappel":
+                        case "!anniv" :
                             AgendaService.getInstance().dispatch(server,channel,msg,user,cmd,content);
                             break;
+                        case "!flood" :
+                            FloodService.getInstance().dispatch(server,channel,msg,user,cmd,content);
+                            break;
+                        case "!pierre" :
+                        case "!feuille" :
+                        case "!ciseaux" :
+                        case "!pfc" :
+                            PfcService.getInstance().dispatch(server,channel,msg,user,cmd,content);
+                            break;
+                        case "!pimp" :
+                            PimpService.getInstance().dispatch(server,channel,msg,user,cmd,content);
+                            break;
+                        case "!quizz" :
+                            QuizzService.getInstance().dispatch(server,channel,msg,user,cmd,content);
+                            break;
+                        case "!score":
+                        case "!classement":
+                            JeuxService.getInstance().dispatch(server,channel,msg,user,cmd,content);
+                            break;
+                        case "!cmd" :
+                            CommandService.getInstance().dispatch(server, channel, msg, user, cmd, content);
+                            break;
                         default:
-                            MsgUtils.tell(channel, "Je ne connais pas cette commande");
+                            CommandService.getInstance().dispatch(server, channel, msg, user, cmd, content);
+                            //MsgUtils.tell(channel, "Je ne connais pas cette commande");
                             break;
                     }
                 } else {
-
+                    QuizzService.getInstance().publicMsg(server,msg,user,content);
                 }
             }
 
             AdminService.getInstance().storeMsg(channel,msg);
+            FloodService.getInstance().newMsg(server, channel,user);
 
         }
 

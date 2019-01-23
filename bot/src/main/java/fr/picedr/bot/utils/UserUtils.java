@@ -9,6 +9,7 @@ import net.dv8tion.jda.core.entities.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -63,5 +64,37 @@ public class UserUtils {
         logger.debug("getUserByName - end");
         return result;
     }
+
+    /**
+     * get user object by his ID
+     * @param server : server on which the request is done
+     * @param id : id of the user
+     * @return an User object or null if nothing found
+     */
+    public static User getUserById(Guild server,String id){
+        logger.debug("getUserById - start : server=<"+server.getName()+"> - id=<"+id+">");
+        User result =  server.getMemberById(id).getUser();
+        logger.debug("getUserById - end");
+        return result;
+    }
+
+    /**
+     * Get all users from a server
+     * @param server : server on which the request is done
+     * @return a list of the Users of the server
+     */
+    public static List<User> getUsers(Guild server){
+        logger.debug("getUsers - start : server=<"+server.getName()+">");
+        List<User> result =  new ArrayList<>();
+        List<Member> members =  server.getMembers();
+        for (Member member:members){
+            result.add(member.getUser());
+        }
+        logger.debug("getUsers - end");
+        return result;
+    }
+
+
+
 
 }

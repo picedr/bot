@@ -40,7 +40,8 @@ public class Params {
     public static String SRV_SLOW = "slow";
     public static String SRV_CLEAR = "clear";
     public static String SRV_AGENDA = "agenda";
-    public static String SRV_ANNIV="anniv";
+    public static String SRV_CMD="commands";
+    public static String SRV_JEUX="jeux";
 
     public static Hashtable<String, String> SRV_DESC;
     static {
@@ -51,10 +52,14 @@ public class Params {
         SRV_DESC.put(SRV_SLOW,"Permet de ralentir le rythme de message sur un chan");
         SRV_DESC.put(SRV_CLEAR,"Permet d'effacer **x** messages sur un chan");
         SRV_DESC.put(SRV_AGENDA,"Gestion d'évenements avec rappels");
-        SRV_DESC.put(SRV_ANNIV,"Gestion des anniversaires");
+        SRV_DESC.put(SRV_CMD,"Permet de créer des commandes personnalisées");
+        SRV_DESC.put(SRV_JEUX,"Met à disposition un ensemble de jeux");
     }
 
-
+    /*
+    MISC
+    */
+    public static int DEFAUL_TYPING_DELAY = 2;
 
 
 

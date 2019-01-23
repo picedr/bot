@@ -1,6 +1,9 @@
 package fr.picedr.bot.listener;
 
 import fr.picedr.bot.admin.AdminService;
+import fr.picedr.bot.jeux.pimp.PimpService;
+import fr.picedr.bot.jeux.quizz.QuizzService;
+import fr.picedr.bot.utils.MsgUtils;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.Event;
@@ -41,13 +44,19 @@ public class PrivateListener implements EventListener {
                         logger.debug("!stop");
                         AdminService.getInstance().dispatch(null,null,msg,user,cmd,content);
                         break;
+                    case "!pair" :
+                    case "!impair" :
+                        PimpService.getInstance().dispatch(null,null,msg,user,cmd,content);
+                        break;
+                    case "!quizz" :
+                        QuizzService.getInstance().dispatch(null,null,msg,user,cmd,content);
+                        break;
                     default :
-
+                        MsgUtils.tell(user,"Tu es sûr de vouloir fair ça ici ?",2);
                         break;
                 }
             }else{
-
-
+                MsgUtils.tell(user,"Hum hum ...",2);
             }
 
 

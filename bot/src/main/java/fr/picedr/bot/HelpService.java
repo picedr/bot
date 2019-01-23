@@ -2,6 +2,12 @@ package fr.picedr.bot;
 
 import fr.picedr.bot.admin.AdminService;
 import fr.picedr.bot.agenda.AgendaService;
+import fr.picedr.bot.command.CommandService;
+import fr.picedr.bot.jeux.JeuxService;
+import fr.picedr.bot.jeux.flood.FloodService;
+import fr.picedr.bot.jeux.pfc.PfcService;
+import fr.picedr.bot.jeux.pimp.PimpService;
+import fr.picedr.bot.jeux.quizz.QuizzService;
 import fr.picedr.bot.utils.MsgUtils;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Message;
@@ -49,13 +55,19 @@ public class HelpService implements BotService {
             tell.add("Les catégories disponibles sont : ");
 
             //End User help
-
+            tell.add("- agenda");
+            tell.add("- commands");
+            tell.add("- jeux");
+            tell.add("  * flood");
+            tell.add("  * pfc");
+            tell.add("  * pimp");
+            tell.add("  * quizz");
 
             //Admin help
             if (channel.getId().equals(bot.getServersConf().get(server.getId()).get(Params.CONF_ADMINCHANNEL))) {
                 tell.add("- admin");
             }
-            MsgUtils.tellBlockFramed(channel,tell,"css");
+            MsgUtils.tellBlockFramed(channel,tell,"css",0);
 
         } else {
             switch (content.toLowerCase()) {
@@ -65,8 +77,25 @@ public class HelpService implements BotService {
                 case "agenda":
                     AgendaService.help(server,channel);
                     break;
+                case "commands":
+                    CommandService.help(server,channel);
+                    break;
+                case "jeux" :
+                    JeuxService.help(server,channel);
+                    break;
+                case "flood" :
+                    FloodService.help(server,channel);
+                    break;
+                case "pfc" :
+                    PfcService.help(server,channel);
+                    break;
+                case "pimp" :
+                    PimpService.help(server,channel);
+                    break;
+                case "quizz" :
+                    QuizzService.help(server, channel);
                 default:
-                    MsgUtils.tell(channel, "Catégorie inconnue");
+                    MsgUtils.tell(channel, "Catégorie inconnue",0);
             }
         }
 
@@ -82,7 +111,7 @@ public class HelpService implements BotService {
      * @param server  : server which called the help
      */
     public static void help(Guild server, TextChannel channel) {
-        MsgUtils.tell(channel, "Aucune aide pour cette fonctionnalité");
+        MsgUtils.tell(channel, "Aucune aide pour cette fonctionnalité",0);
     }
 
 }
