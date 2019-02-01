@@ -10,6 +10,7 @@ import fr.picedr.bot.exception.DataNotFoundException;
 import fr.picedr.bot.listener.MiscListener;
 import fr.picedr.bot.listener.PrivateListener;
 import fr.picedr.bot.listener.PublicListener;
+import fr.picedr.bot.papy.PapyService;
 import fr.picedr.bot.utils.MsgUtils;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
@@ -107,12 +108,18 @@ public class Bot {
 					switch (hour){
 						case 1:
 							AgendaService.getInstance().clear(Calendar.getInstance().getTime());
+						case 4:
+							PapyService.getInstance().newDay();
+							break;
 						case 6:
 							for (String key: services.keySet()) {
+								Guild server = jda.getGuildById(key);
+								TextChannel chan = jda.getTextChannelById(serversConf.get(key).get(Params.CONF_GENERALCHANNEL));
 								if (services.get(key).get(Params.SRV_AGENDA).equals("1")){
-									Guild server = jda.getGuildById(key);
-									TextChannel chan = jda.getTextChannelById(serversConf.get(key).get(Params.CONF_GENERALCHANNEL));
 									AgendaService.getInstance().today(server,chan);
+								}
+								if (services.get(key).get(Params.SRV_PAPY).equals("1")){
+									PapyService.getInstance().journee(server,chan);
 								}
 
 							}

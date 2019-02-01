@@ -27,7 +27,7 @@ public class MiscListener  implements EventListener {
 
     public void onEvent(Event event) {
         if (event instanceof UserUpdateGameEvent) {
-            logger.debug("UserUpdateGameEvent");
+ /*           logger.debug("UserUpdateGameEvent");
             //A user change game status
             UserUpdateGameEvent  e = (UserUpdateGameEvent) event;
             Guild server = e.getGuild();
@@ -38,7 +38,7 @@ public class MiscListener  implements EventListener {
                     "- user=<"+user.getName()+"> " +
                     "- newGame=<"+newGame.getName()+"> ");// +
                   //  "- oldGame=<"+oldGame.getName()+">");
-
+*/
         }else if (event instanceof GuildVoiceJoinEvent){
             //user join a voice channel
             logger.debug("GuildVoiceJoinEvent");

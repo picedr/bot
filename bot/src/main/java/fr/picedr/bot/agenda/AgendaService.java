@@ -96,6 +96,9 @@ public class AgendaService implements BotService {
                        case "rem":
                            rem(server,channel,msg,user,content);
                            break;
+                       case "clean":
+                           clear(Calendar.getInstance().getTime());
+                           break;
                        case "" :
                            wishAnnivs(server,channel);
                            break;
@@ -153,6 +156,7 @@ public class AgendaService implements BotService {
                 tell.add("- !agenda list : Liste tous les évenement.");
                 tell.add("- !rappel <id> liste de rappels : ajoute un ou des rappels à l'évenement <id>.");
                 tell.add("- !rappel rem <id> : supprime le rappel.");
+                tell.add("- !rappel clean : supprime tous les évenement dépassés (est fait automatiquement tous les matins sinon).");
                 tell.add("Les rappels peuvent être de la forme **Xm** (minutes), **Xh** (heures) ou **Xj** (jours)");
             }
 
@@ -241,6 +245,7 @@ public class AgendaService implements BotService {
             if (cmd.equals("!anniv")){
                 if (spDate.length != 2) {
                     MsgUtils.tell(chan, "La date doit être au format jj/mm");
+                    dateOK=false;
                 } else {
                     try {
                         month = new Integer(spDate[1]);

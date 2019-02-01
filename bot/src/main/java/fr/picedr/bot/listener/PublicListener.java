@@ -11,6 +11,7 @@ import fr.picedr.bot.jeux.flood.FloodService;
 import fr.picedr.bot.jeux.pfc.PfcService;
 import fr.picedr.bot.jeux.pimp.PimpService;
 import fr.picedr.bot.jeux.quizz.QuizzService;
+import fr.picedr.bot.papy.PapyService;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.TextChannel;
@@ -105,12 +106,22 @@ public class PublicListener implements EventListener {
                         case "!cmd" :
                             CommandService.getInstance().dispatch(server, channel, msg, user, cmd, content);
                             break;
+                        case "!boule8" :
+                        case "!gif":
+                        case "!journee":
+                            PapyService.getInstance().dispatch(server,channel,msg,user,cmd,content);
+                            break;
                         default:
                             CommandService.getInstance().dispatch(server, channel, msg, user, cmd, content);
                             //MsgUtils.tell(channel, "Je ne connais pas cette commande");
                             break;
                     }
                 } else {
+                    if (content.toLowerCase().replaceAll(" ","").equals("papy?")){
+                        PapyService.getInstance().papy(server,channel);
+                    }
+                    PapyService.getInstance().hello(server,channel,user);
+                    PapyService.getInstance().papyGif(server,channel,user,content);
                     QuizzService.getInstance().publicMsg(server,msg,user,content);
                 }
             }

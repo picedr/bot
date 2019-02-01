@@ -221,7 +221,7 @@ class AgendaDAO extends DAO {
         PreparedStatement ps = null;
 
         try {
-            String query = "DELETE agenda_rappel WHERE parent=?";
+            String query = "DELETE FROM agenda_rappel WHERE parent=?";
             ps = conn.prepareStatement(query);
             ps.setInt(1, parentId);
             result = ps.executeUpdate();
